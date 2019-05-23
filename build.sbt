@@ -6,9 +6,9 @@ description := "Module that gives full compatibility with XML-RPC for Scala"
 
 organization := "com.github.jvican"
 
-scalaVersion := "2.12.1"
+scalaVersion := "2.12.8"
 
-crossScalaVersions := Seq("2.11.8", "2.12.1")
+crossScalaVersions := Seq("2.11.8", "2.12.8")
 
 resolvers ++= Seq(
   Resolver.sonatypeRepo("releases"),
@@ -16,14 +16,16 @@ resolvers ++= Seq(
 )
 
 libraryDependencies ++= {
-  val scalazVersion = "7.2.8"
-  val akkaHttp = "10.0.2"
-  val scalaTestVersion = "3.0.1"
-  val shapelessVersion = "2.3.2"
+  val scalazVersion = "7.2.27"
+  val akkaHttp = "10.1.8"
+  val scalaTestVersion = "3.0.7"
+  val shapelessVersion = "2.3.3"
 
   Seq(
     "org.scalaz"             %% "scalaz-core"    % scalazVersion,
     "com.typesafe.akka"      %% "akka-http-xml"  % akkaHttp,
+    "com.typesafe.akka"      %% "akka-actor"     % "2.5.23",
+    "com.typesafe.akka"      %% "akka-stream"    % "2.5.23",
     "org.scalatest"          %% "scalatest"      % scalaTestVersion    % "test",
     "com.chuusai"            %% "shapeless"      % shapelessVersion
   )

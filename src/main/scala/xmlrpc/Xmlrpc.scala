@@ -12,6 +12,7 @@ import xmlrpc.protocol._
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.xml.NodeSeq
+import akka.http.scaladsl.model.headers.HttpCredentials
 
 /**
   * This is the client api to connect to the Xmlrpc server. A client can send any request
@@ -26,7 +27,7 @@ object Xmlrpc {
 
   import XmlrpcProtocol._
 
-  case class XmlrpcServer(fullAddress: String) {
+  case class XmlrpcServer(fullAddress: String, credentials: Option[HttpCredentials] = None) {
     def uri: Uri = Uri(fullAddress)
   }
 
@@ -43,12 +44,15 @@ object Xmlrpc {
       f.flatMap(Unmarshal(_).to[A])
 
 
-    val request: NodeSeq = writeXmlRequest(name, parameter)
-    val requestWithHeader: String = """<?xml version="1.0"?>""" + request.toString
-
+    val requestBody: NodeSeq = writeXmlRequest(name, parameter)
+    val requestBodyWithHeader: String = """<?xml version="1.0"?>""" + requestBody.toString
+    val request: HttpRequest = {
+      val base = Post(xmlrpcServer.uri, requestBody)
+      xmlrpcServer.credentials.map(base.addCredentials).getOrElse(base)
+    }
 
     try {
-      (Http().singleRequest(Post(xmlrpcServer.uri, request)) ~> unmarshall[NodeSeq]).asXmlrpcResponse[R]
+      (Http().singleRequest(request) ~> unmarshall[NodeSeq]).asXmlrpcResponse[R]
     } catch {
       case t: Throwable => XmlrpcResponse(ConnectionError("An exception has been thrown by Spray", Some(t)).failures)
     }
