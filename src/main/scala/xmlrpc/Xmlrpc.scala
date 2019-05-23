@@ -48,7 +48,7 @@ object Xmlrpc {
 
 
     try {
-      (Http().singleRequest(Post(xmlrpcServer.uri, request)) ~> unmarshall[NodeSeq]).asXmlrpcResponse[R]
+      (Http().singleRequest(Post(xmlrpcServer.uri, request).mapEntity(_.withContentType(ContentTypes.`text/xml(UTF-8)`))) ~> unmarshall[NodeSeq]).asXmlrpcResponse[R]
     } catch {
       case t: Throwable => XmlrpcResponse(ConnectionError("An exception has been thrown by Spray", Some(t)).failures)
     }
